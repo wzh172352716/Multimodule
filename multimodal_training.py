@@ -405,22 +405,22 @@ def main():
     #     lambda x: os.path.join(image_folder, x)
     # )
 
-    # set_seed(seed_val)
-    # classifier_train_test(
-    #     df_train,
-    #     df_test,
-    #     classifier_type="bert",
-    #     output_folder=results_folder,
-    #     args=args,
-    # )
-    # set_seed(seed_val)
-    # classifier_train_test(
-    #     df_train,
-    #     df_test,
-    #     classifier_type="bert_resnet",
-    #     output_folder=results_folder,
-    #     args=args,
-    # )
+    set_seed(seed_val)
+    classifier_train_test(
+        df_train,
+        df_test,
+        classifier_type="bert",
+        output_folder=results_folder,
+        args=args,
+    )
+    set_seed(seed_val)
+    classifier_train_test(
+        df_train,
+        df_test,
+        classifier_type="bert_resnet",
+        output_folder=results_folder,    
+        args=args,
+    )
     set_seed(seed_val)
     classifier_train_test(
         df_train,

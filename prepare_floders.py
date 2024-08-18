@@ -115,7 +115,7 @@ def main():
 
         urls_cuisines = [
             ('https://www.food365.com.cn/caixi/lucai/', 'caixi', 'lucai'),
-            #('https://www.food365.com.cn/caixi/chuancai/', 'caixi', 'chuancai'),
+            ('https://www.food365.com.cn/caixi/chuancai/', 'caixi', 'chuancai'),
             # 添加其他URLs和菜系对
             ('https://www.food365.com.cn/caixi/huicai/', 'caixi', 'huicai'),
         ]
