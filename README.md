@@ -1,6 +1,9 @@
-<<<<<<< HEAD
 # Multimodule
-=======
+Used for recognizing eight different dishes from China.
+1. Use prepare_floders.py to grab specificed dishes pictures and describe then prepare the folders
+2. Use devidedata.py to prepare testdata and traindata.
+3. Use multimodal_training.py to train the model.
+
 # Classifying Multimodal Data using Transformers
 
 ## Motivation
