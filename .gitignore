@@ -1,3 +1,15 @@
-KDD/
+<<<<<<< HEAD
+=======
 result/
+./KDD/*
+*.jpg
+*.csv
+*.zip
+*.pyc
+*.pth
+*.pt
+*.json
+*.png
+*__MACOSX*
 train.csv
+>>>>>>> other-repo/main
