@@ -1,3 +1,8 @@
+# TO DO LIST
+1. 数据集的准备：图片相似性的问题，无效文本检查问题
+   扩充数据集，每个菜系的菜品数量150+-
+2. 
+
 # Multimodule
 Used for recognizing eight different dishes from China.
 1. Use prepare_floders.py to grab specificed dishes pictures and describe then prepare the folders
