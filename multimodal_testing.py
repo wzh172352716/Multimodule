@@ -8,15 +8,16 @@ from multimodal_training import from_pretrained, set_seed
 
 
 def main():
-    home_folder = "./KDD/"
-    trained_model_folders = home_folder + "trained_models/"
-    data_folder = home_folder + "webvision_data/"
+    home_folder = "./CAIXI/"
+    #trained_model_folders = home_folder + "trained_models/"
+    trained_model_folders = home_folder + "results/"
+    data_folder = home_folder + "CAIPING_data/"
     image_folder = data_folder + "images/"
     results_folder = home_folder + "results/"
     os.makedirs(results_folder, exist_ok=True)
 
     df_test = pd.read_csv(data_folder + "test.csv")
-    df_test["img_path"] = df_test["img_path"].apply(lambda x: image_folder + x)
+    #df_test["img_path"] = df_test["img_path"].apply(lambda x: image_folder + x)
 
     seed_val = 0
     set_seed(seed_val)

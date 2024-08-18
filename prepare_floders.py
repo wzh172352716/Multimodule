@@ -46,8 +46,8 @@ def get_data(url):
         return []
 
 
-# 爬取单个菜品的详情（文本和图片）
-def detail_get(url, output_dir):
+# 爬取单个菜品的详情（文本和图片），所有图片保存到统一的图片文件夹
+def detail_get(url, output_dir, cuisine, img_counter):
     try:
         response = requests.get(url, headers=header)
         response.raise_for_status()
@@ -64,24 +64,25 @@ def detail_get(url, output_dir):
         # 下载图片并保存路径
         img_paths = []
         img_urls = content_div.xpath('.//img/@src')
-        for index, img_url in enumerate(img_urls, start=1):
+        for index, img_url in enumerate(img_urls):
             img_response = requests.get(img_url, headers=header)
             img_response.raise_for_status()
-            img_path = os.path.join(output_dir, f'picture{index}.jpg')
+            img_path = os.path.join(output_dir, f'{cuisine}_{img_counter}.jpg')  # 使用拼音命名
             with open(img_path, 'wb') as img_file:
                 img_file.write(img_response.content)
             img_paths.append(img_path)
+            img_counter += 1  # 更新图片编号
 
-        return text_content, img_paths
+        return text_content, img_paths, img_counter
 
     except Exception as e:
         print(f"Error fetching details from {url}: {e}")
-        return "", []
-
+        return "", [], img_counter
 
 # 处理单个菜系的所有页面，并爬取数据
-def fetch_and_process(url, category, cuisine, csv_writer):
-    print(f"正在爬取 {cuisine}...")
+
+def fetch_and_process(url, category, cuisine, csv_writer, img_counter):
+    print(f"正在爬取 {cuisine}...")  # 这里cuisine已经是拼音版本
 
     # 获取总页数
     total_pages = page_get(url)
@@ -89,18 +90,15 @@ def fetch_and_process(url, category, cuisine, csv_writer):
     # 遍历每个页面，获取菜品数据
     for page in range(1, total_pages + 1):
         page_url = f"{url}/index_{page}.html" if page > 1 else url
-        dishes = get_data(page_url)  # 这里使用 get_data 爬取每一页的数据
+        dishes = get_data(page_url)
 
         for index, dish in enumerate(dishes, start=1):
             for name, link in dish.items():
-                folder_path = os.path.join('./result', category, cuisine, f'菜名{index}_{name}')
-                os.makedirs(folder_path, exist_ok=True)
-
                 # 获取菜品详情：文本和图片路径
-                text_content, img_paths = detail_get(link, folder_path)
+                text_content, img_paths, img_counter = detail_get(link, './CAIXI/CAIPING_data/images', cuisine, img_counter)
 
-                # 写入 CSV 文件，使用菜系名称作为 label
-                label = cuisine
+                # 写入 CSV 文件，使用拼音作为 label
+                label = cuisine  # 这里cuisine是拼音形式
                 for img_path in img_paths:
                     csv_writer.writerow([text_content, img_path, label])
 
@@ -111,20 +109,23 @@ def fetch_and_process(url, category, cuisine, csv_writer):
 # 主函数，执行所有菜系的爬取
 def main():
     # 创建 CSV 文件并写入表头
-    with open('train.csv', 'w', newline='', encoding='utf-8-sig') as csvfile:
+    with open('CAIXI/CAIPING_data/train.csv', 'w', newline='', encoding='utf-8-sig') as csvfile:
         csv_writer = csv.writer(csvfile)
         csv_writer.writerow(['text', 'img_path', 'label'])  # 写入表头
 
         urls_cuisines = [
-            ('https://www.food365.com.cn/caixi/lucai/', '菜系', '鲁菜'),
-            ('https://www.food365.com.cn/caixi/chuancai/', '菜系', '川菜'),
+            ('https://www.food365.com.cn/caixi/lucai/', 'caixi', 'lucai'),
+            #('https://www.food365.com.cn/caixi/chuancai/', 'caixi', 'chuancai'),
             # 添加其他URLs和菜系对
+            ('https://www.food365.com.cn/caixi/huicai/', 'caixi', 'huicai'),
         ]
+
+        img_counter = 1  # 用于图片命名的计数器
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
             futures = []
             for url, category, cuisine in urls_cuisines:
-                futures.append(executor.submit(fetch_and_process, url, category, cuisine, csv_writer))
+                futures.append(executor.submit(fetch_and_process, url, category, cuisine, csv_writer, img_counter))
             for future in concurrent.futures.as_completed(futures):
                 future.result()  # 获取结果或异常
 

@@ -11,5 +11,5 @@ result/
 *.json
 *.png
 *__MACOSX*
-train.csv
+./CAIXI/*
 >>>>>>> other-repo/main

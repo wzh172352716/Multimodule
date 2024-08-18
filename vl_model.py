@@ -117,16 +117,22 @@ class AlbefModel(nn.Module):
 
         albef_bert_config = AlbefBertConfig.from_json_file(albef_bert_config_fp)
         albef_model = AlbefModel(bert_config=albef_bert_config, num_labels=num_out_labels)
+        try:
+            albef_checkpoint = torch.load(albef_model_fp, map_location='cpu')
+            albef_state_dict = albef_checkpoint['model']
+        except Exception as e:
+            print(f"Error loading model: {e}")
+            print(f"Model file size: {os.path.getsize(albef_model_fp)} bytes")
+            return None  # 如果模型加载失败，返回 None，避免后续引用未赋值的变量
 
-        albef_checkpoint = torch.load(albef_model_fp, map_location='cpu')
-        albef_state_dict = albef_checkpoint['model']
-
+        # 处理bert相关的state_dict键值
         for key in list(albef_state_dict.keys()):
             if 'bert' in key:
                 encoder_key = key.replace('bert.', '')
                 albef_state_dict[encoder_key] = albef_state_dict[key]
                 del albef_state_dict[key]
 
+        # 加载模型的state_dict
         msg = albef_model.load_state_dict(albef_state_dict, strict=False)
         print("ALBEF checkpoint loaded from ", albef_model_fp)
         print(msg)

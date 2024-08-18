@@ -83,6 +83,10 @@ class VLDataset(Dataset):
             img_path = self.df.at[index, self.image_path_field]
 
             image = Image.open(img_path)
+            # print(f"图像路径: {img_path}, 模式: {image.mode}")  # 输出图像路径和类型
+            # 如果图像是 RGBA 模式，将其转换为 RGB 模式
+            if image.mode == 'RGBA':
+                image = image.convert('RGB')
             if self.train:
                 img = self.train_transform_func(image)
             else:
@@ -117,6 +121,7 @@ class VLClassifier:
         )
         if self.model is not None:
             self.model.to(self.device)
+        print(f"Using device: {self.device}")
 
     def train(self, df_train, training_args):
         self.training_args = training_args
@@ -358,7 +363,7 @@ def classifier_train_test(df_train, df_test, classifier_type, output_folder, arg
     df_out.to_csv(output_folder + classifier_type + "_predictions.csv", index=False)
 
     model_save_dir = os.path.join(output_folder, classifier_type)
-    os.makedirs(model_save_dir)
+    os.makedirs(model_save_dir, exist_ok=True)
     classifier.save(model_save_dir)
 
 
@@ -370,19 +375,19 @@ def set_seed(seed_val):
 
 
 def main():
-    home_folder = "./KDD/"
-    data_folder = home_folder + "webvision_data/"
+    home_folder = "./CAIXI/"
+    data_folder = home_folder + "CAIPING_data/"
     image_folder = data_folder + "images/"
     results_folder = home_folder + "results/"
     os.makedirs(results_folder, exist_ok=True)
 
-    df_train = pd.read_csv(data_folder + "train.csv")
+    df_train = pd.read_csv(data_folder + "train_split.csv")
     df_test = pd.read_csv(data_folder + "test.csv")
 
     seed_val = 0
 
     args = {
-        "batch_size": 16,
+        "batch_size": 4,
         "num_train_epochs": 5,
         "learning_rate": 1.0e-5,
         "weight_decay": 0.01,
@@ -393,29 +398,29 @@ def main():
         "image_path_field": "img_path",
     }
 
-    df_train[args["image_path_field"]] = df_train[args["image_path_field"]].apply(
-        lambda x: image_folder + x
-    )
-    df_test[args["image_path_field"]] = df_test[args["image_path_field"]].apply(
-        lambda x: image_folder + x
-    )
+    # df_train[args["image_path_field"]] = df_train[args["image_path_field"]].apply(
+    #     lambda x: os.path.join(image_folder, x)
+    # )
+    # df_test[args["image_path_field"]] = df_test[args["image_path_field"]].apply(
+    #     lambda x: os.path.join(image_folder, x)
+    # )
 
-    set_seed(seed_val)
-    classifier_train_test(
-        df_train,
-        df_test,
-        classifier_type="bert",
-        output_folder=results_folder,
-        args=args,
-    )
-    set_seed(seed_val)
-    classifier_train_test(
-        df_train,
-        df_test,
-        classifier_type="bert_resnet",
-        output_folder=results_folder,
-        args=args,
-    )
+    # set_seed(seed_val)
+    # classifier_train_test(
+    #     df_train,
+    #     df_test,
+    #     classifier_type="bert",
+    #     output_folder=results_folder,
+    #     args=args,
+    # )
+    # set_seed(seed_val)
+    # classifier_train_test(
+    #     df_train,
+    #     df_test,
+    #     classifier_type="bert_resnet",
+    #     output_folder=results_folder,
+    #     args=args,
+    # )
     set_seed(seed_val)
     classifier_train_test(
         df_train,
